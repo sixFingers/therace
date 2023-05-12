@@ -21,10 +21,11 @@ const config = {
 
 const game = new Phaser.Game(config);
 const socket = io({
+    transports: ['websocket'],
     reconnection: false,
 });
 
 socket.on("disconnect", (reason) => {
     console.log('Disconnected', reason);
-    
+
   });
