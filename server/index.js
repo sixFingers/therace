@@ -1,3 +1,5 @@
+const Game = require('./game');
+
 const defaults = {
     framerate: 1000 / 10,
 }
@@ -29,9 +31,7 @@ module.exports = class GameServer {
     onSocketConnect(socket) {
         const [gameId] = socket.rooms;
         
-        this.games.set(gameId, {
-            players: {},
-        });
+        this.games.set(gameId, new Game(gameId));
     
         console.log(`[server] Game ${gameId} created.`);
         
@@ -47,8 +47,9 @@ module.exports = class GameServer {
     }
 
     tick() {
-        this.games.forEach((game, id) => {
-            this.server.to(id).emit('tick', game);
+        this.games.forEach((game) => {
+            game.update();
+            this.server.to(game.id).emit('tick', game.getState());
         });
     }
 }

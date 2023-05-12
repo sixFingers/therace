@@ -5,15 +5,10 @@ export default class Game extends Phaser.Game {
     constructor(config) {
         super(config);
 
-        this.socket = io({
+        this.server = io({
             transports: ['websocket'],
             autoConnect: false,
             reconnection: false,
-        });
-        
-        this.socket.on("disconnect", (reason) => {
-            console.log('Disconnected', reason);
-            
         });
     }
 }
