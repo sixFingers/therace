@@ -1,27 +1,54 @@
-const games = new Map();
-
-const onSocketConnect = (socket) => {
-    const [gameId] = socket.rooms;
-    
-    games.set(gameId, {
-        players: {},
-    });
-
-    console.log(`[server] Game ${gameId} created.`);
-    
-    socket.on('disconnecting', onSocketDisconnecting.bind(null, socket));
+const defaults = {
+    framerate: 1000 / 10,
 }
 
-const onSocketDisconnecting = (socket) => {
-    const [gameId] = socket.rooms;
+module.exports = class GameServer {
+    server = null;
+    games = null;
+    interval = null;
 
-    games.delete(gameId);
+    constructor(server, config) {
+        this.server = server;
+        this.games = new Map();
+        
+        config = {...defaults, ...config};
 
-    console.log(`[server] Game ${gameId} destroyed.`);
+        this.framerate = config.framerate;
+    }
+
+    start() {
+        this.server.on('connect', this.onSocketConnect.bind(this));
+        
+        setInterval(this.tick.bind(this), this.framerate);
+    }
+
+    stop() {
+        this.server.disconnectSockets();
+    }
+
+    onSocketConnect(socket) {
+        const [gameId] = socket.rooms;
+        
+        this.games.set(gameId, {
+            players: {},
+        });
+    
+        console.log(`[server] Game ${gameId} created.`);
+        
+        socket.on('disconnecting', this.onSocketDisconnecting.bind(this, socket));
+    }
+
+    onSocketDisconnecting(socket) {
+        const [gameId] = socket.rooms;
+    
+        this.games.delete(gameId);
+    
+        console.log(`[server] Game ${gameId} destroyed.`);
+    }
+
+    tick() {
+        this.games.forEach((game, id) => {
+            this.server.to(id).emit('tick', game);
+        });
+    }
 }
-
-const bind = (io) => {
-    io.on('connect', onSocketConnect);
-};
-
-module.exports = { bind };

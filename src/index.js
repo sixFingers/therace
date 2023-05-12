@@ -1,31 +1,14 @@
-import * as Phaser from 'phaser';
-import { io } from 'socket.io-client';
+import Phaser from 'phaser';
 
-function preload() {
-    this.load.image('star', '/img/star.png');
-};
-
-function create() {
-    this.add.image(400, 300, 'star');
-};
+import LoadingScene from './scene-loading';
+import GameScene from './scene-game';
+import Game from './game';
 
 const config = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
-    scene: {
-        preload: preload,
-        create: create
-    },
+    scene: [LoadingScene, GameScene],
 };
 
-const game = new Phaser.Game(config);
-const socket = io({
-    transports: ['websocket'],
-    reconnection: false,
-});
-
-socket.on("disconnect", (reason) => {
-    console.log('Disconnected', reason);
-
-  });
+const game = new Game(config);
