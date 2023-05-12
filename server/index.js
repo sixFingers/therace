@@ -1,7 +1,8 @@
 const Game = require('./game');
 
 const defaults = {
-    framerate: 1000 / 10,
+    framerate: 1000 / 60,
+    tickrate: 1000 / 10,
 }
 
 module.exports = class GameServer {
@@ -16,12 +17,14 @@ module.exports = class GameServer {
         config = {...defaults, ...config};
 
         this.framerate = config.framerate;
+        this.tickrate = config.tickrate;
     }
 
     start() {
         this.server.on('connect', this.onSocketConnect.bind(this));
         
-        setInterval(this.tick.bind(this), this.framerate);
+        setInterval(this.update.bind(this), this.framerate);
+        setInterval(this.tick.bind(this), this.tickrate);
     }
 
     stop() {
@@ -46,9 +49,14 @@ module.exports = class GameServer {
         console.log(`[server] Game ${gameId} destroyed.`);
     }
 
+    update() {
+        this.games.forEach((game) => {
+            game.update(this.framerate);
+        });
+    }
+
     tick() {
         this.games.forEach((game) => {
-            game.update();
             this.server.to(game.id).emit('tick', game.getState());
         });
     }

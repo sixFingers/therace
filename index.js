@@ -9,7 +9,8 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, { serveClient: false });
 const gameServer = new GameServer(io, {
-    framerate: 1000,
+    framerate: 1000 / 60,
+    tickrate: 1000 / 4,
 });
 const PORT = process.env.PORT || 3000;
 
