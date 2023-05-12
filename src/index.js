@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import { io } from 'socket.io-client';
 
 function preload() {
     this.load.image('star', '/img/star.png');
@@ -18,4 +19,12 @@ const config = {
     },
 };
 
-var game = new Phaser.Game(config);
+const game = new Phaser.Game(config);
+const socket = io({
+    reconnection: false,
+});
+
+socket.on("disconnect", (reason) => {
+    console.log('Disconnected', reason);
+    
+  });
