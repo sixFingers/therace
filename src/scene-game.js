@@ -23,18 +23,18 @@ export default class GameScene extends Phaser.Scene {
         for (let p = 0; p < 10; p ++) {
             const id = `player-${p}`;
 
-            const player = this.physics.add.sprite(50, 50, 'player');
+            const player = this.add.image(40 * p, 50, 'player');
             // const ghost = this.add.image(50, 50, 'player').setTint(0xFF0000);
             
             // player.setBounce(1);
-            player.setCollideWorldBounds(true);
+            // player.setCollideWorldBounds(true);
 
             this.players.set(id, player);
             // this.ghosts.set(id, ghost);
             this.state.set(id, {
-                x: 50,
+                x: 40 * p,
                 y: 50,
-                px: 50,
+                px: 40 * p,
                 py: 50,
             });
         }
@@ -59,7 +59,7 @@ export default class GameScene extends Phaser.Scene {
 
         for (const playerId in state) {
             const player = this.players.get(playerId);
-            const ghost = this.ghosts.get(playerId);
+            // const ghost = this.ghosts.get(playerId);
             const newPlayerState = state[playerId];
             const playerState = this.state.get(playerId);    
 
@@ -67,6 +67,7 @@ export default class GameScene extends Phaser.Scene {
                 continue;
             }
 
+            // ghost.setPosition(newPlayerState.x, newPlayerState.y);
             playerState.px = playerState.x;
             playerState.py = playerState.y;
             playerState.x = newPlayerState.x;

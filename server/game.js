@@ -13,29 +13,35 @@ module.exports = class Game {
 
         for (let p = 0; p < 10; p ++) {
             const id = `player-${p}`;
-            const player = this.physics.add.body(50, 50, 16, 16);
+            
+            const player = this.physics.add.body(40 * p, 50);
+            player.setCircle(8);
 
             player.setCollideWorldBounds(true);
-            // player.setBounce(1);
-            player.setVelocityX(Math.floor(Math.random() * 100));
-            player.setVelocityY(Math.floor(Math.random() * 100));
+            player.setBounce(1);
+            player.setVelocityX(Math.random() * 100);
+            player.setVelocityY(Math.random() * 100);
 
             this.players.set(id, player);
             this.state[id] = {x: 50, y: 50};
         }
+
+        const values = Array.from(this.players.values());
+
+        this.physics.add.collider(values);
     }
 
     update(framerate) {
         this.frame ++;
         this.physics.world.update(this.frame * 1000, framerate);
+        this.physics.world.postUpdate(this.frame * 1000, framerate);
+        this.physics.collide(this.players.values());
     }
 
     getState() {
         this.players.forEach((player, id) => {
             this.state[id].x = player.position.x;
             this.state[id].y = player.position.y;
-            this.state[id].vx = player.velocity.x;
-            this.state[id].vy = player.velocity.y;
         });
 
         return this.state;
